@@ -3,7 +3,7 @@
 # Copyright (C) 2006-2025 NVDA Mitwirkende
 # Diese Datei unterliegt der GNU General Public License.
 # Weitere Informationen finden Sie in der Datei COPYING.
-from NVDAObjects.UIA import ListItem
+from NVDAObjects.UIA import ListItem,UIA
 import appModuleHandler
 import controlTypes
 import api
@@ -16,6 +16,14 @@ class AppModule(appModuleHandler.AppModule):
 	def chooseNVDAObjectOverlayClasses(self, obj, clslist):
 		if obj.name in self.unigetitemnames:
 			clslist.insert(0, unigetuiListItem)
+		elif obj.name == '':
+			clslist.insert(0, unigetuiUnlabeledcontrol)
+class unigetuiUnlabeledcontrol(UIA):
+	def _get_name(self):
+		l = list()
+		for x in self.children:
+			if x.name and x.role == controlTypes.ROLE_STATICTEXT: l.append(x.name)
+		return "; ".join(l)
 
 class unigetuiListItem(ListItem):
 	def _get_name(self):
