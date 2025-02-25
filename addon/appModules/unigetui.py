@@ -23,7 +23,11 @@ class unigetuiUnlabeledcontrol(UIA):
 		l = list()
 		for x in self.children:
 			if x.name and x.role == controlTypes.ROLE_STATICTEXT: l.append(x.name)
-		return "; ".join(l)
+		innerlabel = "; ".join(l)
+		if innerlabel: ret = innerlabel
+		else: ret = self.UIAAutomationId
+		return ret
+
 
 class unigetuiListItem(ListItem):
 	def _get_name(self):
