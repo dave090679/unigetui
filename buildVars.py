@@ -19,11 +19,12 @@ addon_info = {
 	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
 	"addon_description" : _("improves accesibility of unigetui, a gui for winget and other windows package managers"),
 	# version
-	"addon_version" : "0.4",
+	"addon_version" : "0.5",
 	# Author(s)
 	"addon_author" : "David Parduhn <xkill85@gmx.net>",
 	# URL for the add-on documentation support
-	"addon_url" : None,
+	"addon_url" : "https://github.com/dave090679/unigetui/releases",
+	"addon_sourceURL": "https://github.com/dave090679/unigetui",
 	# Documentation file name
 	"addon_docFileName" : "readme.html",
 	"lastTestedNVDAVersion": "2024.4.2",
