@@ -10,9 +10,12 @@ import api
 from scriptHandler import script
 import addonHandler
 # Entfernen Sie das Kommentarzeichen (#) aus der nächsten Zeile, wenn (und sobald) die Datei zu einem Addon gehört. Dadurch werden Lokalisierungsfunktionen (Übersetzungsfunktionen) in Ihrer Datei aktiviert. Weitere Informationen finden Sie im Entwicklungshandbuch für NVDA-Addons.
-#addonHandler.initTranslation()
+addonHandler.initTranslation()
 class AppModule(appModuleHandler.AppModule):
-	unigetitemnames = ['UniGetUI.Interface.IgnoredPackageEntry','UniGetUI.Interface.Widgets.SourceItem']
+	unigetitemnames = ['UniGetUI.Interface.IgnoredPackageEntry',
+	'UniGetUI.Interface.Widgets.SourceItem',
+	'NavigationViewItem'
+	]
 	def chooseNVDAObjectOverlayClasses(self, obj, clslist):
 		if obj.name in self.unigetitemnames:
 			clslist.insert(0, unigetuiListItem)

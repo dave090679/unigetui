@@ -1,14 +1,151 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
-<title>unigetui 0.5</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../style.css" media="screen">
+<title>unigetui 0.6</title>
 </head>
 <body>
-<h1>unigetui</h1>
-<p>nvda add-on for unigetui</p>
+<h1>NVDA Add-on Scons Template</h1>
+<p>This package contains a basic template structure for NVDA add-on development, building, distribution and localization.
+For details about NVDA add-on development, please see the <a href="https://github.com/nvdaaddons/DevGuide/wiki/NVDA-Add-on-Development-Guide">NVDA Add-on Development Guide</a>.
+The NVDA add-on development/discussion list <a href="https://nvda-addons.groups.io/g/nvda-addons">is here</a>
+Information specific to NV Access add-on store <a href="https://github.com/nvaccess/addon-datastore">can be found here</a>.</p>
+<p>Copyright (C) 2012-2025 NVDA Add-on team contributors.</p>
+<p>This package is distributed under the terms of the GNU General Public License, version 2 or later. Please see the file COPYING.txt for further details.</p>
+<p><a href="https://github.com/alekssamos/">alekssamos</a> added automatic package of add-ons through Github Actions.</p>
+<p>For details about Github Actions, see the <a href="https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions">Workflow syntax for GitHub Actions</a>.</p>
+<p>Copyright (C) 2022 alekssamos</p>
+<h2>Features</h2>
+<p>This template provides the following features you can use during NVDA add-on development and packaging:</p>
+<ul>
+<li>Automatic add-on package creation, with naming and version loaded from a centralized build variables file (buildVars.py) or command-line interface.<ul>
+<li>See packaging section for details on using command-line switches when packaging add-ons with custom version information.</li>
+<li>This process will happen automatically when receiving a pull request, and there is also the possibility of manual launch.</li>
+<li>To let the workflow run automatically when pushing to main or master (development) branch, remove the comment for branches line in GitHub Actions (<code>.github/workflows/build_addon.yml</code>).</li>
+<li>If you have created a tag (E.G.: <code>git tag v1.0 &amp;&amp; git push --tag</code>), then a release will be automatically created and the add-on file will be uploaded as an asset.</li>
+<li>Otherwise, with normal commits or with manual startup, you can download the artifacts from the Actions page of your repository.</li>
+</ul>
+</li>
+<li>Manifest file creation using a template (manifest.ini.tpl). Build variables are replaced on this template. See below for add-on manifest specification.</li>
+<li>Compilation of gettext mo files before distribution, when needed.<ul>
+<li>To generate a gettext pot file, please run <code>scons pot</code>. An <code>addon-name.pot</code> file will be created with all gettext messages for your add-on. You need to check the <code>buildVars.i18nSources</code> variable to comply with your requirements.</li>
+</ul>
+</li>
+<li>Automatic generation of manifest localization files directly from gettext po files. Please make sure buildVars.py is included in i18nFiles.</li>
+<li>Automatic generation of HTML documents from markdown (.md) files, to manage documentation in different languages.</li>
+</ul>
+<p>In addition, this template includes configuration files for the following tools for use in add-on development and testing (see "additional tools" section for details):</p>
+<ul>
+<li>Ruff (pyproject.toml/tool.ruff sections): a Python linter written in Rust. Sections starting with tool.ruff house configuration options for Ruff.</li>
+<li>Configuration for VS Code. It requires NVDA's repo at the same level as the add-on folder containing your actual source files, with prepared source code (<code>scons source</code>). preparing the source code is a step in the instructions for building NVDA itself, see <a href="https://github.com/nvaccess/nvda">The NVDA Repository</a> for details.<ul>
+<li>Place the .vscode in this repo within the addon folder, where your add-on source files (will) reside. The settings file within this folder assumes the NVDA repository is within the parent folder of this folder. If your addon folder is within the addonTemplate folder, then your NVDA repository folder needs to also be within the addonTemplate folder, or the source will not be found.</li>
+<li>Open the addon folder in VS Code. This should initialize VS Code with the correct settings and provide you with code completion and other VS Code features. </li>
+<li>Press <code>control+shift+m</code> after saving a file to search for problems.</li>
+<li>Use arrow and tab keys for the autocompletion feature.</li>
+<li>Press <code>control+shift+p</code> to open the commands palette and search for recommended extensions to install or check if they are installed.</li>
+</ul>
+</li>
+</ul>
+<h2>Requirements</h2>
+<p>You need the following software to use this code for your NVDA add-on development and packaging:</p>
+<ul>
+<li>a Python distribution (3.11 or later is recommended). Check the <a href="https://www.python.org">Python Website</a> for Windows Installers. Please note that at present, preparing the NVDA source code requires the 32-bit version of Python 3.11.</li>
+<li>Scons - <a href="https://www.scons.org/">Website</a> - version 4.8.1 or later. You can install it via PIP.</li>
+<li>GNU Gettext tools, if you want to have localization support for your add-on - Recommended. Any Linux distro or cygwin have those installed. You can find windows builds <a href="https://gnuwin32.sourceforge.net/downlinks/gettext.php">here</a>.</li>
+<li>Markdown 3.7 or later, if you want to convert documentation files to HTML documents. You can install it via PIP.</li>
+</ul>
+<p>Note, that you may not need these tools in a local build environment, if you are using <a href="https://appveyor.com/">Appveyor</a> or <a href="https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions">GitHub Actions</a>, to build and package your add-ons.</p>
+<h2>Usage</h2>
+<h3>To create a new NVDA add-on using this template:</h3>
+<ol>
+<li>Create an empty folder to hold the files for your add-on.</li>
+<li>Copy the folder:
+<code>site_scons</code>
+and the following files, into your new empty folder:
+<code>buildVars.py
+manifest.ini.tpl
+manifest-translated.ini.tpl
+sconstruct
+.gitignore
+.gitattributes</code></li>
+<li>If you intend to use the provided GitHub workflow, also copy the folder:
+<code>.github</code>
+and file:
+<code>.pre-commit-config.yaml</code></li>
+<li>Create an <code>addon</code> folder inside your new folder. You will put your code in the usual folders for NVDA extensions, under the <code>addon</code> folder. For instance: <code>globalPlugins</code>, <code>synthDrivers</code>, etc.</li>
+<li>In the <code>buildVars.py</code> file, change variable <code>addon_info</code> with your add-on's information (name, summary, description, version, author, url, source url, license, and license URL). Also, be sure to carefully set the paths contained in the other variables in that file. If you need to use custom Markdown extensions, original add-on interface language is not English, or include custom braille translations tables, be sure to fil out markdown list, base language variable, and braille tables dictioanry, respectively.</li>
+<li>Gettext translations must be placed into <code>addon\locale\&lt;lang&gt;/LC_MESSAGES\nvda.po</code>.</li>
+</ol>
+<h4>Add-on manifest specification</h4>
+<p>An add-on manifest generated manually or via <code>buildVars.py</code> must include the following information:</p>
+<ul>
+<li>Name (string): a unique internal identifier for the add-on. It must use camel case (e.g. someModule). This is also used as part of add-on store to identify the add-on uniquely.</li>
+<li>Summary (string): name as shown on NVDA's Add-on store.</li>
+<li>Description (string): a short detailed description about the add-on.</li>
+<li>Version (string), ideally number.number with an optional third number, denoting major.minor.patch.</li>
+<li>Author (string and an email address): one or more add-on author contact information in the form "name <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#101;&#109;&#97;&#105;&#108;&#64;&#97;&#100;&#100;&#114;&#101;&#115;&#115;">&#101;&#109;&#97;&#105;&#108;&#64;&#97;&#100;&#100;&#114;&#101;&#115;&#115;</a>".</li>
+<li>URL (string): a web address where the add-on information can be found such as add-on repository.</li>
+<li>docFileName (string): name of the documentation file.</li>
+<li>minimumNVDAVersion (year.major or year.major.minor): the earliest version of NVDA the add-on is compatible with (e.g. 2019.3). Add-ons are expected to use features introduced in this version of NVDA or declare compatibility with it.</li>
+<li>lastTestedNVDAVersion (year.major or year.major.minor): the latest or last tested version of NVDA the add-on is said to be compatible with (e.g. 2020.3). Add-on authors are expected to declare this value after testing add-ons with the version of NVDA specified.</li>
+<li>addon_updateChannel (string or None): the update channel for the add-on release.</li>
+</ul>
+<p>In addition, the following information must be filled out (not used in the manifest but used elsewhere such as add-on store) in buildVars:</p>
+<ul>
+<li>sourceURL (string): repository URL for the add-on source code.</li>
+<li>license (string): the license of the add-on and its source code.</li>
+<li>licenseURL: the URL for the license file.</li>
+</ul>
+<h5>Custom add-on information</h5>
+<p>In addition to the core manifest data, custom add-on information can be specified. </p>
+<h6>Braille translation tables</h6>
+<p>Information on custom braille tables must be specified in buildVars under <code>brailleTables</code> dictionary as follows:</p>
+<ul>
+<li>Table name (string key for a nested dictionary): each <code>brailleTables</code> entry is a filename for the included custom braille table placed in <code>brailleTables</code> folder inside <code>addon</code> folder. This nested dictionary should specify:<ul>
+<li>displayName (string): the name of the table shown to users and is translatable.</li>
+<li>contracted (True/False): is this a contracted braille table (True) or uncontracted (False).</li>
+<li>output (True/False): the table can be listed in output table list in NVDA's braille settings.</li>
+<li>input (True/False): braille can be entered using this table and listed in input table list in NVDA's braille settings.</li>
+</ul>
+</li>
+</ul>
+<p>Note: you must fill out this dictionary if at least one custom braille table is included in the add-on. If not, leave the dictionary empty.</p>
+<h6>Speech symbol dictionaries</h6>
+<p>Information on custom symbol dictionaries must be specified in buildVars under <code>symbolDictionaries</code> dictionary as follows:</p>
+<ul>
+<li>Dictionary name (string key for a nested dictionary): each <code>symbolDictionaries</code> entry is a name for the included custom symbol dictionary placed in <code>locale\&lt;language&gt;</code> folder inside <code>addon</code> folder. The file is named <code>symbols-&lt;dictionary_name&gt;.dic</code>. This nested dictionary should specify:<ul>
+<li>displayName (string): the name of the dictionary shown to users and is translatable.</li>
+<li>mandatory (True/False): Always enabled (True) or optional and visible in the GUI (False)</li>
+</ul>
+</li>
+</ul>
+<p>Note: you must fill out this dictionary if at least one custom symbol dictionary is included in the add-on. If not, leave the dictionary empty.</p>
+<h3>To manage documentation files for your addon:</h3>
+<ol>
+<li>Copy the <code>readme.md</code> file for your add-on to the first created folder, where you copied <code>buildVars.py</code>. You can also copy <code>style.css</code> to improve the presentation of HTML documents.</li>
+<li>Documentation files (named <code>readme.md</code>) must be placed into <code>addon\doc\&lt;lang&gt;/</code>.</li>
+</ol>
+<h3>To package the add-on for distribution:</h3>
+<ol>
+<li>Open a command line, change to the folder that has the <code>sconstruct</code> file (usually the root of your add-on development folder) and run the <code>scons</code> command. The created add-on, if there were no errors, is placed in the current directory.</li>
+<li>You can further customize variables in the <code>buildVars.py</code> file.</li>
+<li>You can also customize version and update channel information from command line by passing the following switches when running scons:<ul>
+<li>version: add-on version string.</li>
+<li>versionNumber: add-on version number of the form major.minor.patch (all integers)</li>
+<li>channel: update channel (do not use this switch unless you know what you are doing).</li>
+<li>dev: suitable for development builds, names the add-on according to current date (yyyymmdd) and sets update channel to "dev".</li>
+</ul>
+</li>
+</ol>
+<h3>Additional tools</h3>
+<p>The template includes configuration files for use with additional tools such as linters. These include:</p>
+<ul>
+<li>Ruff (pyproject.toml): a Python linter written in Rust (0.4.10 or later, can be installed with PIP).</li>
+</ul>
+<p>Read the documentation for the tools you wish to use when building and developing add-ons.</p>
+<p>Note that this template only provides a basic add-on structure and build infrastructure. You may need to adapt it for your specific needs such as using additional tools.</p>
+<p>If you have any issues please use the NVDA addon list mentioned above.</p>
 </body>
 </html>
